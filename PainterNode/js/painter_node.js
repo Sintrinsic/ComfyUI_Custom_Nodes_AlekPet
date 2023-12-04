@@ -1228,7 +1228,12 @@ function PainterWidget(node, inputName, inputData, app) {
     name: `w${inputName}`,
     callback: () => {},
     draw: function (ctx, _, widgetWidth, y, widgetHeight) {
-      const margin = 10,
+        let aspect_ratio = 1;
+        if (typeof this.parent.imgs !== 'undefined') {
+            console.log("Width: " + this.parent.imgs[0].naturalWidth + " Height: " + this.parent.imgs[0].naturalHeight);
+            aspect_ratio = this.parent.imgs[0].naturalHeight / this.parent.imgs[0].naturalWidth;
+        }
+        const margin = 10,
         left_offset = 8,
         top_offset = 30,
         visible = app.canvas.ds.scale > 0.6 && this.type === "painter_widget",
@@ -1256,14 +1261,14 @@ function PainterWidget(node, inputName, inputData, app) {
         transformOrigin: "0 0",
         transform: scale,
         width: w + "px",
-        height: w + "px",
+        height: w * aspect_ratio + "px",
       });
 
       Object.assign(this.painter_wrap.children[1].style, {
         transformOrigin: "0 0",
         transform: scale,
         width: w + "px",
-        height: w + "px",
+        height: w * aspect_ratio + "px",
       });
 
       Array.from(
@@ -1348,15 +1353,19 @@ function PainterWidget(node, inputName, inputData, app) {
   };
 
   node.onResize = function () {
-    let [w, h] = this.size;
-    if (w <= 531) w = 530;
-    if (h <= 571) h = 570;
+      let aspect_ratio = 1;
+      if (typeof node.imgs !== 'undefined') {
+          console.log("Width: " + node.imgs[0].naturalWidth + " Height: " + node.imgs[0].naturalHeight);
+          aspect_ratio = node.imgs[0].naturalHeight / node.imgs[0].naturalWidth;
+      }
+      let buffer = 90;
+      let [w, h] = this.size;
+      h = (w * aspect_ratio) + buffer ;
 
-    if (w > 531) {
-      h = w + 40;
-    }
+      if (w < 530) w = 530;
+      if (h < 610) h = 610;
 
-    this.size = [w, h];
+      this.size = [w, h];
   };
 
   node.onDrawBackground = function (ctx) {
